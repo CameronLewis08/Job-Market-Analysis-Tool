@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: public
+    tables:
+      - name: raw_listings
+        description: Raw job listings scraped from We Work Remotely
+        columns:
+          - name: id
+            description: Unique listing ID from the WWR URL slug
+            tests:
+              - unique
+              - not_null

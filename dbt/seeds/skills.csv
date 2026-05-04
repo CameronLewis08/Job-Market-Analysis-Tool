@@ -1,0 +1,58 @@
+skill,category
+Python,language
+SQL,language
+Scala,language
+Java,language
+Go,language
+R,language
+Bash,language
+Rust,language
+Apache Spark,processing
+PySpark,processing
+Apache Flink,processing
+Apache Kafka,processing
+dbt,transformation
+Apache Airflow,orchestration
+Prefect,orchestration
+Dagster,orchestration
+Luigi,orchestration
+Mage,orchestration
+Snowflake,warehouse
+BigQuery,warehouse
+Redshift,warehouse
+Databricks,warehouse
+Synapse,warehouse
+ClickHouse,warehouse
+DuckDB,warehouse
+Fivetran,ingestion
+Airbyte,ingestion
+Stitch,ingestion
+AWS,cloud
+GCP,cloud
+Azure,cloud
+Terraform,infrastructure
+Docker,infrastructure
+Kubernetes,infrastructure
+Helm,infrastructure
+Pulumi,infrastructure
+Apache Hadoop,storage
+HDFS,storage
+S3,storage
+Delta Lake,storage
+Apache Iceberg,storage
+Apache Hudi,storage
+Parquet,storage
+PostgreSQL,database
+MySQL,database
+MongoDB,database
+Elasticsearch,database
+Redis,database
+Tableau,visualization
+Looker,visualization
+Power BI,visualization
+Grafana,visualization
+Metabase,visualization
+Superset,visualization
+NumPy,library
+Pandas,library
+scikit-learn,library

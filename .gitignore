@@ -216,3 +216,17 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# dbt
+.dbt/
+dbt_packages/
+target/
+logs/
+
+# React Router
+/.react-router/
+/build/
+
+.DS_Store
+
+/node_modules/

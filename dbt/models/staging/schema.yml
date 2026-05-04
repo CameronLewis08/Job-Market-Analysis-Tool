@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: stg_listings
+    description: Cleaned and typed job listings from raw_listings
+    columns:
+      - name: id
+        description: Unique listing ID from WWR URL slug
+        tests:
+          - unique
+          - not_null
+      - name: title
+        tests:
+          - not_null

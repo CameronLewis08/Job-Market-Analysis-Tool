@@ -1,0 +1,46 @@
+name: Weekly ETL Pipeline
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Monday 6am UTC
+  workflow_dispatch:
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Set up ChromeDriver
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Run scraper
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEON_HOST: ${{ secrets.NEON_HOST }}
+          NEON_DB: ${{ secrets.NEON_DB }}
+          NEON_USER: ${{ secrets.NEON_USER }}
+          NEON_PASSWORD: ${{ secrets.NEON_PASSWORD }}
+        run: python -m scraper.main
+
+      - name: Run dbt
+        env:
+          NEON_HOST: ${{ secrets.NEON_HOST }}
+          NEON_DB: ${{ secrets.NEON_DB }}
+          NEON_USER: ${{ secrets.NEON_USER }}
+          NEON_PASSWORD: ${{ secrets.NEON_PASSWORD }}
+        working-directory: dbt
+        run: |
+          dbt deps
+          dbt seed
+          dbt run
+          dbt test
