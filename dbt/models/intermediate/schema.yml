@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: int_listing_skills
+    description: One row per listing x skill where the skill appears in the description
+    columns:
+      - name: listing_id
+        tests:
+          - not_null
+      - name: skill
+        tests:
+          - not_null

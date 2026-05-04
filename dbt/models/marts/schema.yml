@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: mart_skill_frequency
+    description: Count of listings mentioning each skill, grouped by skill category
+    columns:
+      - name: skill
+        tests:
+          - not_null
+          - unique
+      - name: listing_count
+        tests:
+          - not_null
