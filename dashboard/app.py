@@ -8,6 +8,8 @@ import psycopg2
 import streamlit as st
 from dotenv import load_dotenv
 
+from dashboard.helpers import filter_weekly_trends, top_skills
+
 load_dotenv()
 
 st.set_page_config(page_title="Job Market Intelligence", layout="wide")
@@ -79,7 +81,42 @@ with tab3:
 # ── Tab 4: Week-over-Week Trends ──────────────────────────────────────────────
 with tab4:
     st.header("Week-over-Week Skill Demand")
-    st.caption("Coming once mart_weekly_trends is implemented.")
+    df_trends = query(
+        """
+        select week_start, skill, skill_category, listing_count
+        from mart_weekly_trends
+        where week_start between %(from)s and %(to)s
+        order by week_start
+        """,
+        {"from": date_from, "to": date_to},
+    )
+    if df_trends.empty:
+        st.info("No data in selected date range.")
+    else:
+        default_skills = top_skills(df_trends, n=5)
+        selected_skills = st.multiselect(
+            "Skills to compare",
+            options=sorted(df_trends["skill"].unique()),
+            default=default_skills,
+        )
+        df_chart = filter_weekly_trends(df_trends, selected_skills)
+        if df_chart.empty:
+            st.info("Select at least one skill above.")
+        else:
+            fig = px.line(
+                df_chart,
+                x="week_start",
+                y="listing_count",
+                color="skill",
+                labels={
+                    "week_start": "Week",
+                    "listing_count": "# Listings",
+                    "skill": "Skill",
+                },
+                height=500,
+            )
+            fig.update_layout(xaxis_title="Week (Monday)", yaxis_title="Listing Count")
+            st.plotly_chart(fig, use_container_width=True)
 
 # ── Tab 5: Skill Co-occurrence ─────────────────────────────────────────────────
 with tab5:

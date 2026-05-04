@@ -1,6 +1,19 @@
 version: 2
 
 models:
+  - name: mart_weekly_trends
+    description: Listing count per skill per ISO week, for trend charting
+    columns:
+      - name: week_start
+        tests:
+          - not_null
+      - name: skill
+        tests:
+          - not_null
+      - name: listing_count
+        tests:
+          - not_null
+
   - name: mart_skill_frequency
     description: Count of listings mentioning each skill, grouped by skill category
     columns:
