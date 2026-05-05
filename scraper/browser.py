@@ -18,7 +18,7 @@ def create_driver() -> uc.Chrome:
     options = uc.ChromeOptions()
     options.add_argument(f"--user-agent={USER_AGENT}")
     logger.debug("Creating undetected Chrome driver")
-    return uc.Chrome(options=options)
+    return uc.Chrome(options=options, version_main=147)
 
 
 def fetch_page(driver: uc.Chrome, url: str) -> str:
