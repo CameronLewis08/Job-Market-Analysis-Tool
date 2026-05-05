@@ -28,8 +28,8 @@ MAX_PAGES = 5
 ENRICH_DETAIL_FIELDS = os.getenv("SCRAPER_ENRICH_DETAILS", "false").lower() == "true"
 
 
-def get_connection() -> psycopg2.extensions.connection:
-    return psycopg2.connect(validate_env())
+def get_connection(db_url: str) -> psycopg2.extensions.connection:
+    return psycopg2.connect(db_url)
 
 
 def scrape_category(driver, conn, category: str, slug: str) -> int:
@@ -57,7 +57,8 @@ def scrape_category(driver, conn, category: str, slug: str) -> int:
 
 
 def main() -> None:
-    conn = get_connection()
+    db_url = validate_env()
+    conn = get_connection(db_url)
     ensure_table(conn)
     driver = create_driver()
     try:

@@ -17,12 +17,12 @@ logger = get_logger(__name__)
 DEFAULT_BATCH_SIZE = 100
 
 
-def get_connection() -> psycopg2.extensions.connection:
-    return psycopg2.connect(validate_env())
+def get_connection(db_url: str) -> psycopg2.extensions.connection:
+    return psycopg2.connect(db_url)
 
 
-def backfill_missing_details(batch_size: int) -> int:
-    conn = get_connection()
+def backfill_missing_details(batch_size: int, db_url: str) -> int:
+    conn = get_connection(db_url)
     driver = create_driver()
     updated = 0
 
@@ -74,8 +74,9 @@ def backfill_missing_details(batch_size: int) -> int:
 
 
 def main() -> None:
+    db_url = validate_env()
     batch_size = int(os.getenv("SCRAPER_DETAIL_BACKFILL_LIMIT", str(DEFAULT_BATCH_SIZE)))
-    backfill_missing_details(batch_size)
+    backfill_missing_details(batch_size, db_url)
 
 
 if __name__ == "__main__":
