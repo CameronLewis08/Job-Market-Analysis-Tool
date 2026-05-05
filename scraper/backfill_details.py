@@ -56,10 +56,6 @@ def backfill_missing_details(batch_size: int) -> int:
                 "description_raw": row[8],
             }
 
-            if not listing["url"]:
-                logger.debug("Skipping listing %s — no URL", listing["id"])
-                continue
-
             html = fetch_page(driver, listing["url"])
             detail_fields = parse_job_detail(html)
             listing["date_posted"] = listing["date_posted"] or detail_fields["date_posted"]
