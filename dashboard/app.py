@@ -8,7 +8,12 @@ import psycopg2
 import streamlit as st
 from dotenv import load_dotenv
 
-from dashboard.helpers import filter_weekly_trends, top_skills
+from dashboard.helpers import (
+    build_cooccurrence_matrix,
+    filter_cooccurrence,
+    filter_weekly_trends,
+    top_skills,
+)
 
 load_dotenv()
 
@@ -121,4 +126,35 @@ with tab4:
 # ── Tab 5: Skill Co-occurrence ─────────────────────────────────────────────────
 with tab5:
     st.header("Skill Co-occurrence Heatmap")
-    st.caption("Coming once mart_skill_cooccurrence is implemented.")
+    df_cooccurrence = query(
+        """
+        select skill_a, skill_b, cooccurrence_count
+        from mart_skill_cooccurrence
+        order by cooccurrence_count desc, skill_a, skill_b
+        """
+    )
+    if df_cooccurrence.empty:
+        st.info("No co-occurrence data available.")
+    else:
+        min_available = int(df_cooccurrence["cooccurrence_count"].min())
+        max_available = int(df_cooccurrence["cooccurrence_count"].max())
+        min_threshold = st.slider(
+            "Minimum co-occurrence count",
+            min_value=min_available,
+            max_value=max_available,
+            value=max(min_available, 2),
+            step=1,
+        )
+        df_filtered = filter_cooccurrence(df_cooccurrence, min_threshold)
+        if df_filtered.empty:
+            st.info("No skill pairs match the selected threshold.")
+        else:
+            matrix = build_cooccurrence_matrix(df_filtered)
+            fig = px.imshow(
+                matrix,
+                labels={"x": "Skill", "y": "Skill", "color": "Co-occurrence Count"},
+                color_continuous_scale="Blues",
+                aspect="auto",
+            )
+            fig.update_layout(xaxis_title="Skill", yaxis_title="Skill", height=700)
+            st.plotly_chart(fig, use_container_width=True)

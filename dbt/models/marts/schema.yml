@@ -1,6 +1,19 @@
 version: 2
 
 models:
+  - name: mart_skill_cooccurrence
+    description: Skill-pair co-occurrence counts based on shared listing mentions
+    columns:
+      - name: skill_a
+        tests:
+          - not_null
+      - name: skill_b
+        tests:
+          - not_null
+      - name: cooccurrence_count
+        tests:
+          - not_null
+
   - name: mart_weekly_trends
     description: Listing count per skill per ISO week, for trend charting
     columns:
