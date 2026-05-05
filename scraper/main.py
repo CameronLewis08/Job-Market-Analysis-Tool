@@ -20,7 +20,6 @@ CATEGORY_SOURCES = {
         "/categories/remote-front-end-programming-jobs",
         "/categories/remote-devops-sysadmin-jobs",
     ],
-    "data-science": [],
 }
 MAX_PAGES = 5
 

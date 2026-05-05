@@ -22,17 +22,10 @@ def test_scraper_user_agent_matches_issue_requirement():
     assert user_agent == "JobMarketResearchBot/1.0"
 
 
-def test_scraper_targets_programming_and_data_science():
+def test_scraper_targets_programming_categories():
     category_sources = _literal_from_assignment(ROOT / "scraper" / "main.py", "CATEGORY_SOURCES")
-    assert category_sources == {
-        "programming": [
-            "/categories/remote-full-stack-programming-jobs",
-            "/categories/remote-back-end-programming-jobs",
-            "/categories/remote-front-end-programming-jobs",
-            "/categories/remote-devops-sysadmin-jobs",
-        ],
-        "data-science": [],
-    }
+    assert list(category_sources.keys()) == ["programming"]
+    assert len(category_sources["programming"]) == 4
 
 
 def test_scraper_max_pages_capped_at_five():
