@@ -3,7 +3,7 @@ from __future__ import annotations
 import random
 import time
 
-import undetected_chromedriver as uc
+from seleniumbase import Driver
 
 from scraper.log import get_logger
 
@@ -13,14 +13,12 @@ USER_AGENT = "JobMarketResearchBot/1.0"
 BOT_CHALLENGE_RETRIES = 3
 
 
-def create_driver() -> uc.Chrome:
-    options = uc.ChromeOptions()
-    options.add_argument(f"--user-agent={USER_AGENT}")
-    logger.debug("Creating undetected Chrome driver")
-    return uc.Chrome(options=options)
+def create_driver() -> Driver:
+    logger.debug("Creating seleniumbase UC driver")
+    return Driver(uc=True, headless=False, agent=USER_AGENT)
 
 
-def fetch_page(driver: uc.Chrome, url: str) -> str:
+def fetch_page(driver: Driver, url: str) -> str:
     last_source = ""
     for attempt in range(BOT_CHALLENGE_RETRIES):
         driver.get(url)
