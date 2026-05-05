@@ -21,6 +21,6 @@ def get_logger(name: str) -> logging.Logger:
 def validate_env() -> str:
     url = os.getenv("DATABASE_URL")
     if not url:
-        logging.critical("DATABASE_URL is not set — aborting")
+        logging.getLogger(__name__).critical("DATABASE_URL is not set — aborting")
         sys.exit(1)
     return url

@@ -8,7 +8,6 @@ from scraper.log import configure_logging, get_logger, validate_env
 
 
 def test_get_logger_returns_logger_with_correct_name():
-    configure_logging()
     logger = get_logger("scraper.test")
     assert isinstance(logger, logging.Logger)
     assert logger.name == "scraper.test"
