@@ -51,4 +51,4 @@ def _polite_delay() -> None:
 
 def _looks_like_bot_challenge(html: str) -> bool:
     lower = html.lower()
-    return "just a moment..." in lower and "security verification" in lower
+    return "just a moment..." in lower or "security verification" in lower
