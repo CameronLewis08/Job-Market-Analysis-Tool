@@ -21,7 +21,7 @@ def create_driver() -> Driver:
 def fetch_page(driver: Driver, url: str) -> str:
     last_source = ""
     for attempt in range(BOT_CHALLENGE_RETRIES):
-        driver.get(url)
+        driver.uc_open_with_reconnect(url, reconnect_time=3)
         _polite_delay()
         page_source = driver.page_source
         last_source = page_source
