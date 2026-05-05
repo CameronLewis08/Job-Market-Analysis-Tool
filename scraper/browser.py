@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-import os
 import random
 import time
 
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+import undetected_chromedriver as uc
 
 from scraper.log import get_logger
 
@@ -15,18 +13,14 @@ USER_AGENT = "JobMarketResearchBot/1.0"
 BOT_CHALLENGE_RETRIES = 3
 
 
-def create_driver() -> webdriver.Chrome:
-    options = Options()
-    if os.getenv("SCRAPER_HEADLESS", "true").lower() == "true":
-        options.add_argument("--headless=new")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
+def create_driver() -> uc.Chrome:
+    options = uc.ChromeOptions()
     options.add_argument(f"--user-agent={USER_AGENT}")
-    logger.debug("Creating Chrome driver")
-    return webdriver.Chrome(options=options)
+    logger.debug("Creating undetected Chrome driver")
+    return uc.Chrome(options=options)
 
 
-def fetch_page(driver: webdriver.Chrome, url: str) -> str:
+def fetch_page(driver: uc.Chrome, url: str) -> str:
     last_source = ""
     for attempt in range(BOT_CHALLENGE_RETRIES):
         driver.get(url)
