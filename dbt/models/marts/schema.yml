@@ -1,6 +1,32 @@
 version: 2
 
 models:
+  - name: mart_skill_salary
+    description: Salary stats by skill parsed from salary_raw
+    columns:
+      - name: skill
+        tests:
+          - not_null
+      - name: avg_salary
+        tests:
+          - not_null
+      - name: coverage_pct
+        tests:
+          - not_null
+
+  - name: mart_industry_hiring
+    description: Weekly listing volume by category
+    columns:
+      - name: week_start
+        tests:
+          - not_null
+      - name: category
+        tests:
+          - not_null
+      - name: listing_count
+        tests:
+          - not_null
+
   - name: mart_skill_cooccurrence
     description: Skill-pair co-occurrence counts based on shared listing mentions
     columns:
