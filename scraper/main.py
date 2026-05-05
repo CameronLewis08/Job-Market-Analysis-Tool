@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import os
-
 import psycopg2
 from dotenv import load_dotenv
 
@@ -25,7 +23,6 @@ CATEGORY_SOURCES = {
     "data-science": [],
 }
 MAX_PAGES = 5
-ENRICH_DETAIL_FIELDS = os.getenv("SCRAPER_ENRICH_DETAILS", "false").lower() == "true"
 
 
 def get_connection(db_url: str) -> psycopg2.extensions.connection:
@@ -43,12 +40,11 @@ def scrape_category(driver, conn, category: str, slug: str) -> int:
             logger.info("No listings on page %d for %s — stopping", page, slug)
             break
         for listing in listings:
-            if ENRICH_DETAIL_FIELDS:
-                detail_html = fetch_page(driver, listing["url"])
-                detail_fields = parse_job_detail(detail_html)
-                listing["date_posted"] = listing["date_posted"] or detail_fields["date_posted"]
-                listing["salary_raw"] = listing["salary_raw"] or detail_fields["salary_raw"]
-                listing["description_raw"] = detail_fields["description_raw"] or listing["description_raw"]
+            detail_html = fetch_page(driver, listing["url"])
+            detail_fields = parse_job_detail(detail_html)
+            listing["date_posted"] = listing["date_posted"] or detail_fields["date_posted"]
+            listing["salary_raw"] = listing["salary_raw"] or detail_fields["salary_raw"]
+            listing["description_raw"] = detail_fields["description_raw"]
             upsert_listing(conn, listing)
             loaded += 1
         flush(conn)
