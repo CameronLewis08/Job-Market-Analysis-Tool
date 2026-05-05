@@ -32,6 +32,11 @@ jobs:
           NEON_PASSWORD: ${{ secrets.NEON_PASSWORD }}
         run: python -m scraper.main
 
+      - name: Backfill missing details
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python -m scraper.backfill_details
+
       - name: Run dbt
         env:
           NEON_HOST: ${{ secrets.NEON_HOST }}
