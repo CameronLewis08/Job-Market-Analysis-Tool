@@ -3,7 +3,8 @@ from __future__ import annotations
 import random
 import time
 
-from seleniumbase import Driver
+import setuptools  # noqa: F401 — keeps distutils importable on Python 3.12
+import undetected_chromedriver as uc
 
 from scraper.log import get_logger
 
@@ -13,15 +14,17 @@ USER_AGENT = "JobMarketResearchBot/1.0"
 BOT_CHALLENGE_RETRIES = 3
 
 
-def create_driver() -> Driver:
-    logger.debug("Creating seleniumbase UC driver")
-    return Driver(uc=True, headless=False, agent=USER_AGENT)
+def create_driver() -> uc.Chrome:
+    options = uc.ChromeOptions()
+    options.add_argument(f"--user-agent={USER_AGENT}")
+    logger.debug("Creating undetected Chrome driver")
+    return uc.Chrome(options=options)
 
 
-def fetch_page(driver: Driver, url: str) -> str:
+def fetch_page(driver: uc.Chrome, url: str) -> str:
     last_source = ""
     for attempt in range(BOT_CHALLENGE_RETRIES):
-        driver.uc_open_with_reconnect(url, reconnect_time=3)
+        driver.get(url)
         _polite_delay()
         page_source = driver.page_source
         last_source = page_source
