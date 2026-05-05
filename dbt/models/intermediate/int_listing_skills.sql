@@ -15,4 +15,4 @@ select
     s.category   as skill_category
 from listings l
 cross join skills s
-where l.description_raw ilike '%' || s.skill || '%'
+where l.description_raw ~* ('\m' || s.skill || '\m')
