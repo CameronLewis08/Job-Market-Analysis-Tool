@@ -71,17 +71,76 @@ with tab1:
         fig.update_layout(yaxis={"categoryorder": "total ascending"})
         st.plotly_chart(fig, use_container_width=True)
 
-# ── Tab 2: Salary by Skill (placeholder) ──────────────────────────────────────
+# ── Tab 2: Salary by Skill ────────────────────────────────────────────────────
 with tab2:
     st.header("Salary Ranges by Skill")
     st.info("Salary data is sparse — many listings omit salary. Chart shows only listings with parseable salary.")
-    # mart_skill_salary not yet built; placeholder message
-    st.caption("Coming in a future release once mart_skill_salary is implemented.")
+    st.caption("Salary values are parsed from raw salary text and aggregated by skill.")
+    df_salary = query(
+        """
+        select skill, skill_category, min_salary, avg_salary, max_salary, coverage_pct
+        from mart_skill_salary
+        where last_seen between %(from)s and %(to)s
+        order by avg_salary desc
+        limit 30
+        """,
+        {"from": date_from, "to": date_to},
+    )
+    if df_salary.empty:
+        st.info("No salary data in selected date range.")
+    else:
+        coverage = float(df_salary["coverage_pct"].iloc[0])
+        st.metric("Data coverage", f"{coverage:.2f}% of listings include salary")
+        fig = px.bar(
+            df_salary,
+            x="avg_salary",
+            y="skill",
+            color="skill_category",
+            orientation="h",
+            labels={
+                "avg_salary": "Average Salary (USD)",
+                "skill": "Skill",
+                "skill_category": "Category",
+            },
+            custom_data=["min_salary", "max_salary"],
+            height=700,
+        )
+        fig.update_traces(
+            hovertemplate=(
+                "Skill=%{y}<br>"
+                "Avg Salary=$%{x:,.0f}<br>"
+                "Min Salary=$%{customdata[0]:,.0f}<br>"
+                "Max Salary=$%{customdata[1]:,.0f}<extra></extra>"
+            )
+        )
+        fig.update_layout(yaxis={"categoryorder": "total ascending"})
+        st.plotly_chart(fig, use_container_width=True)
 
 # ── Tab 3: Hiring by Category ──────────────────────────────────────────────────
 with tab3:
     st.header("Hiring Volume by Category")
-    st.caption("Coming once mart_industry_hiring is implemented.")
+    st.caption("Aggregated weekly category volume across the selected date range.")
+    df_hiring = query(
+        """
+        select category, sum(listing_count) as listing_count
+        from mart_industry_hiring
+        where week_start between %(from)s and %(to)s
+        group by category
+        order by listing_count desc
+        """,
+        {"from": date_from, "to": date_to},
+    )
+    if df_hiring.empty:
+        st.info("No data in selected date range.")
+    else:
+        fig = px.bar(
+            df_hiring,
+            x="category",
+            y="listing_count",
+            labels={"category": "Category", "listing_count": "# Listings"},
+            height=500,
+        )
+        st.plotly_chart(fig, use_container_width=True)
 
 # ── Tab 4: Week-over-Week Trends ──────────────────────────────────────────────
 with tab4:
