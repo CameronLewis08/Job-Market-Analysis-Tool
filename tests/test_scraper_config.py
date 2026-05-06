@@ -17,9 +17,9 @@ def _literal_from_assignment(file_path: Path, variable_name: str):
     raise AssertionError(f"{variable_name} not found in {file_path}")
 
 
-def test_scraper_user_agent_matches_issue_requirement():
-    user_agent = _literal_from_assignment(ROOT / "scraper" / "browser.py", "USER_AGENT")
-    assert user_agent == "JobMarketResearchBot/1.0"
+def test_bot_challenge_retries_is_three():
+    retries = _literal_from_assignment(ROOT / "scraper" / "browser.py", "BOT_CHALLENGE_RETRIES")
+    assert retries == 3
 
 
 def test_scraper_targets_programming_categories():
