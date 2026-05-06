@@ -21,6 +21,8 @@ A `browser_profile/` directory at the project root stores the persistent Chromiu
 **New dependencies:** `playwright`, `playwright-stealth`
 **Removed dependencies:** `undetected-chromedriver`, `setuptools` (distutils shim — no longer needed)
 
+**One-time setup (not in requirements.txt):** After `pip install playwright`, run `playwright install chromium` to download the Playwright browser binary. Since we use `channel="chrome"` (system Chrome), this is a fallback binary — but the CLI step is required to install Playwright's browser infrastructure.
+
 ---
 
 ## Components
