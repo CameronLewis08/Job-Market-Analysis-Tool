@@ -13,19 +13,24 @@ logger = get_logger(__name__)
 
 BOT_CHALLENGE_RETRIES = 3
 _PROFILE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "browser_profile")
+os.makedirs(_PROFILE_DIR, exist_ok=True)
 
 
 def create_context() -> BrowserContext:
     headless = os.getenv("SCRAPER_HEADLESS", "false").lower() == "true"
     pw = sync_playwright().start()
-    context = pw.chromium.launch_persistent_context(
-        user_data_dir=_PROFILE_DIR,
-        headless=headless,
-        channel="chrome",
-        args=["--disable-blink-features=AutomationControlled"],
-        viewport={"width": 1920, "height": 1080},
-        locale="en-US",
-    )
+    try:
+        context = pw.chromium.launch_persistent_context(
+            user_data_dir=_PROFILE_DIR,
+            headless=headless,
+            channel="chrome",
+            args=["--disable-blink-features=AutomationControlled"],
+            viewport={"width": 1920, "height": 1080},
+            locale="en-US",
+        )
+    except Exception:
+        pw.stop()
+        raise
 
     def _stop() -> None:
         context.close()
@@ -42,7 +47,7 @@ def fetch_page(context: BrowserContext, url: str) -> str:
         page = context.new_page()
         try:
             stealth_sync(page)
-            page.goto(url, wait_until="domcontentloaded", timeout=30000)
+            page.goto(url, wait_until="load", timeout=30000)
             _polite_delay()
             _human_scroll(page)
             page_source = page.content()
