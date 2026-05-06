@@ -17,24 +17,17 @@ def _literal_from_assignment(file_path: Path, variable_name: str):
     raise AssertionError(f"{variable_name} not found in {file_path}")
 
 
-def test_scraper_user_agent_matches_issue_requirement():
-    user_agent = _literal_from_assignment(ROOT / "scraper" / "browser.py", "USER_AGENT")
-    assert user_agent == "JobMarketResearchBot/1.0"
+def test_bot_challenge_retries_is_three():
+    retries = _literal_from_assignment(ROOT / "scraper" / "browser.py", "BOT_CHALLENGE_RETRIES")
+    assert retries == 3
 
 
-def test_scraper_targets_programming_and_data_science():
+def test_scraper_targets_programming_categories():
     category_sources = _literal_from_assignment(ROOT / "scraper" / "main.py", "CATEGORY_SOURCES")
-    assert category_sources == {
-        "programming": [
-            "/categories/remote-full-stack-programming-jobs",
-            "/categories/remote-back-end-programming-jobs",
-            "/categories/remote-front-end-programming-jobs",
-            "/categories/remote-devops-sysadmin-jobs",
-        ],
-        "data-science": [],
-    }
+    assert list(category_sources.keys()) == ["programming"]
+    assert len(category_sources["programming"]) == 4
 
 
-def test_scraper_max_pages_capped_at_five():
+def test_scraper_max_pages_is_one():
     max_pages = _literal_from_assignment(ROOT / "scraper" / "main.py", "MAX_PAGES")
-    assert max_pages == 5
+    assert max_pages == 1

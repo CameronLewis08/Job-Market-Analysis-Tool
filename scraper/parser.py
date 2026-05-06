@@ -7,7 +7,7 @@ from typing import Optional
 from bs4 import BeautifulSoup
 
 WWR_BASE = "https://weworkremotely.com"
-MAX_LISTING_AGE_DAYS = 14
+MAX_LISTING_AGE_DAYS = 7
 COMPENSATION_LINE_PATTERN = re.compile(
     r"(salary|compensation|pay\s*range|base\s*pay|base\s*salary|ote|on[-\s]*target)",
     flags=re.IGNORECASE,
@@ -190,9 +190,5 @@ def _extract_salary_text(description_raw: Optional[str]) -> Optional[str]:
             money_match = MONEY_PATTERN.search(line)
             if money_match:
                 return line
-
-    money_match = MONEY_PATTERN.search(description_raw)
-    if money_match:
-        return money_match.group(0).strip()
 
     return None
