@@ -7,7 +7,7 @@ from typing import Optional
 from bs4 import BeautifulSoup
 
 WWR_BASE = "https://weworkremotely.com"
-MAX_LISTING_AGE_DAYS = 7
+MAX_LISTING_AGE_DAYS = 1
 COMPENSATION_LINE_PATTERN = re.compile(
     r"(salary|compensation|pay\s*range|base\s*pay|base\s*salary|ote|on[-\s]*target)",
     flags=re.IGNORECASE,
