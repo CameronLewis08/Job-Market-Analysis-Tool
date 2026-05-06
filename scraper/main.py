@@ -54,6 +54,8 @@ def scrape_category(context, conn, category: str, slug: str) -> int:
             )
             upsert_listing(conn, listing)
             loaded += 1
+        with conn.cursor() as cur:  # keepalive ping — Neon drops idle connections after ~5 min
+            cur.execute("SELECT 1")
         flush(conn)
         logger.info("Flushed page %d (%d listings so far for %s)", page, loaded, slug)
     return loaded
