@@ -191,8 +191,4 @@ def _extract_salary_text(description_raw: Optional[str]) -> Optional[str]:
             if money_match:
                 return line
 
-    money_match = MONEY_PATTERN.search(description_raw)
-    if money_match:
-        return money_match.group(0).strip()
-
     return None
