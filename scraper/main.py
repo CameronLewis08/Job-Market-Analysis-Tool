@@ -21,7 +21,7 @@ CATEGORY_SOURCES = {
         "/categories/remote-devops-sysadmin-jobs",
     ],
 }
-MAX_PAGES = 5
+MAX_PAGES = 1
 
 
 def get_connection(db_url: str) -> psycopg2.extensions.connection:

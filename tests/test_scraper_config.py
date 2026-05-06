@@ -28,6 +28,6 @@ def test_scraper_targets_programming_categories():
     assert len(category_sources["programming"]) == 4
 
 
-def test_scraper_max_pages_capped_at_five():
+def test_scraper_max_pages_is_one():
     max_pages = _literal_from_assignment(ROOT / "scraper" / "main.py", "MAX_PAGES")
-    assert max_pages == 5
+    assert max_pages == 1
