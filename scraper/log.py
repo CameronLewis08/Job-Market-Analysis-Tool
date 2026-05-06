@@ -12,6 +12,9 @@ def configure_logging() -> None:
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
+    # playwright and urllib3 can be noisy at DEBUG level — suppress them
+    for noisy in ("playwright", "urllib3"):
+        logging.getLogger(noisy).setLevel(logging.WARNING)
 
 
 def get_logger(name: str) -> logging.Logger:
