@@ -23,7 +23,6 @@ def create_context() -> BrowserContext:
         context = pw.chromium.launch_persistent_context(
             user_data_dir=_PROFILE_DIR,
             headless=headless,
-            channel="chrome",
             args=["--disable-blink-features=AutomationControlled"],
             viewport={"width": 1920, "height": 1080},
             locale="en-US",
