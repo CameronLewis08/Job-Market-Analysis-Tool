@@ -67,7 +67,7 @@ def test_parse_new_listing_markup_returns_expected_fields():
               <h3 class="new-listing__header__title">
                 <span class="new-listing__header__title__text">Senior Data Engineer</span>
               </h3>
-              <p class="new-listing__header__icons__date">5d</p>
+              <p class="new-listing__header__icons__date">7d</p>
             </div>
             <p class="new-listing__company-name">Acme Corp</p>
             <p class="new-listing__company-headquarters">Anywhere in the World</p>
@@ -89,13 +89,13 @@ def test_parse_new_listing_markup_returns_expected_fields():
     assert listing["title"] == "Senior Data Engineer"
     assert listing["company"] == "Acme Corp"
     assert listing["category"] == "programming"
-    assert listing["date_posted"] == (date.today() - timedelta(days=5)).isoformat()
+    assert listing["date_posted"] == (date.today() - timedelta(days=7)).isoformat()
     assert listing["url"] == "https://weworkremotely.com/remote-jobs/acme-senior-data-engineer"
     assert listing["location_restriction"] == "Anywhere in the World"
     assert listing["salary_raw"] == "$100,000 or more USD"
 
 
-def test_parse_new_listing_skips_jobs_older_than_5_days():
+def test_parse_new_listing_skips_jobs_older_than_7_days():
     html = """
     <ul>
       <li class="new-listing-container">

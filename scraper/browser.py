@@ -66,15 +66,15 @@ def fetch_page(context: BrowserContext, url: str) -> str:
 
 
 def _polite_delay() -> None:
-    time.sleep(random.uniform(3.0, 6.0))
+    time.sleep(random.uniform(1.5, 3.0))
 
 
 def _human_scroll(page) -> None:
     try:
         page.evaluate("window.scrollTo(0, 400)")
-        time.sleep(random.uniform(0.2, 0.4))
+        time.sleep(random.uniform(0.1, 0.2))
         page.evaluate("window.scrollTo(0, 800)")
-        time.sleep(random.uniform(0.2, 0.4))
+        time.sleep(random.uniform(0.1, 0.2))
         page.evaluate("window.scrollTo(0, 0)")
     except Exception:
         pass
