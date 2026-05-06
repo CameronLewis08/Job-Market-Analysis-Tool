@@ -5,7 +5,7 @@ import random
 import time
 
 from playwright.sync_api import BrowserContext, sync_playwright
-from playwright_stealth import stealth_sync
+from playwright_stealth import Stealth
 
 from scraper.log import get_logger
 
@@ -46,7 +46,7 @@ def fetch_page(context: BrowserContext, url: str) -> str:
     for attempt in range(BOT_CHALLENGE_RETRIES):
         page = context.new_page()
         try:
-            stealth_sync(page)
+            Stealth().apply_stealth_sync(page)
             page.goto(url, wait_until="load", timeout=30000)
             _polite_delay()
             _human_scroll(page)

@@ -63,18 +63,20 @@ def main() -> None:
     db_url = validate_env()
     conn = get_connection(db_url)
     ensure_table(conn)
-    context = create_context()
     try:
-        for category, slugs in CATEGORY_SOURCES.items():
-            if not slugs:
-                logger.warning("%s: skipped (no active source categories)", category)
-                continue
-            count = 0
-            for slug in slugs:
-                count += scrape_category(context, conn, category, slug)
-            logger.info("%s: loaded %d listings", category, count)
+        context = create_context()
+        try:
+            for category, slugs in CATEGORY_SOURCES.items():
+                if not slugs:
+                    logger.warning("%s: skipped (no active source categories)", category)
+                    continue
+                count = 0
+                for slug in slugs:
+                    count += scrape_category(context, conn, category, slug)
+                logger.info("%s: loaded %d listings", category, count)
+        finally:
+            context.stop()
     finally:
-        context.stop()
         conn.close()
 
 
