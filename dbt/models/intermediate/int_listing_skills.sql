@@ -15,4 +15,4 @@ select
     s.category   as skill_category
 from listings l
 cross join skills s
-where l.description_raw ~* ('\m' || regexp_replace(s.skill, '([.+*?^${}()|[\]\\])', '\\\1', 'g') || '\m')
+where l.description_raw ~* ('\m' || regexp_replace(s.skill, '([.+*?^${}()|[\]\\])', '\\\1', 'g') || '\M')
