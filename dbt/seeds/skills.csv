@@ -7,10 +7,18 @@ Go,language
 R,language
 Bash,language
 Rust,language
+JavaScript,language
+TypeScript,language
+C#,language
+Ruby,language
+PHP,language
+Swift,language
+Kotlin,language
 Apache Spark,processing
 PySpark,processing
 Apache Flink,processing
 Apache Kafka,processing
+Apache Beam,processing
 dbt,transformation
 Apache Airflow,orchestration
 Prefect,orchestration
@@ -35,6 +43,9 @@ Docker,infrastructure
 Kubernetes,infrastructure
 Helm,infrastructure
 Pulumi,infrastructure
+GitHub Actions,infrastructure
+Jenkins,infrastructure
+Linux,infrastructure
 Apache Hadoop,storage
 HDFS,storage
 S3,storage
@@ -47,12 +58,31 @@ MySQL,database
 MongoDB,database
 Elasticsearch,database
 Redis,database
+Cassandra,database
+DynamoDB,database
 Tableau,visualization
 Looker,visualization
 Power BI,visualization
 Grafana,visualization
 Metabase,visualization
 Superset,visualization
+Amplitude,analytics
+Mixpanel,analytics
+Lightdash,analytics
 NumPy,library
 Pandas,library
 scikit-learn,library
+TensorFlow,library
+PyTorch,library
+Jupyter,library
+React,frontend
+Angular,frontend
+Vue,frontend
+Node.js,backend
+GraphQL,backend
+REST,backend
+gRPC,backend
+Machine Learning,ml
+Deep Learning,ml
+LLM,ml
+OpenAI,ml
