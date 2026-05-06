@@ -1,49 +1,90 @@
 from __future__ import annotations
 
+import os
 import random
 import time
 
-import setuptools  # noqa: F401 — keeps distutils importable on Python 3.12
-import undetected_chromedriver as uc
+from playwright.sync_api import BrowserContext, sync_playwright
+from playwright_stealth import stealth_sync
 
 from scraper.log import get_logger
 
 logger = get_logger(__name__)
 
-USER_AGENT = "JobMarketResearchBot/1.0"
 BOT_CHALLENGE_RETRIES = 3
+_PROFILE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "browser_profile")
 
 
-def create_driver() -> uc.Chrome:
-    options = uc.ChromeOptions()
-    options.add_argument(f"--user-agent={USER_AGENT}")
-    logger.debug("Creating undetected Chrome driver")
-    return uc.Chrome(options=options, version_main=147)
+def create_context() -> BrowserContext:
+    headless = os.getenv("SCRAPER_HEADLESS", "false").lower() == "true"
+    pw = sync_playwright().start()
+    context = pw.chromium.launch_persistent_context(
+        user_data_dir=_PROFILE_DIR,
+        headless=headless,
+        channel="chrome",
+        args=["--disable-blink-features=AutomationControlled"],
+        viewport={"width": 1920, "height": 1080},
+        locale="en-US",
+    )
+
+    def _stop() -> None:
+        context.close()
+        pw.stop()
+
+    context.stop = _stop  # patch stop() so callers use context.stop() for full cleanup
+    logger.debug("Created persistent browser context (headless=%s, profile=%s)", headless, _PROFILE_DIR)
+    return context
 
 
-def fetch_page(driver: uc.Chrome, url: str) -> str:
+def fetch_page(context: BrowserContext, url: str) -> str:
     last_source = ""
     for attempt in range(BOT_CHALLENGE_RETRIES):
-        driver.get(url)
-        _polite_delay()
-        page_source = driver.page_source
-        last_source = page_source
-        if not _looks_like_bot_challenge(page_source):
-            return page_source
+        page = context.new_page()
+        try:
+            stealth_sync(page)
+            page.goto(url, wait_until="domcontentloaded", timeout=30000)
+            _polite_delay()
+            _human_scroll(page)
+            page_source = page.content()
+            last_source = page_source
+            if not _looks_like_bot_challenge(page_source):
+                return page_source
+        finally:
+            page.close()
         logger.warning(
             "Bot challenge detected on %s (attempt %d/%d)",
             url, attempt + 1, BOT_CHALLENGE_RETRIES,
         )
         if attempt < BOT_CHALLENGE_RETRIES - 1:
-            time.sleep(4)
+            time.sleep(random.uniform(6.0, 12.0))
     logger.error("All %d attempts failed for %s — returning last page source", BOT_CHALLENGE_RETRIES, url)
     return last_source
 
 
 def _polite_delay() -> None:
-    time.sleep(random.uniform(2.0, 3.0))
+    time.sleep(random.uniform(3.0, 6.0))
+
+
+def _human_scroll(page) -> None:
+    try:
+        page.evaluate("window.scrollTo(0, 400)")
+        time.sleep(random.uniform(0.2, 0.4))
+        page.evaluate("window.scrollTo(0, 800)")
+        time.sleep(random.uniform(0.2, 0.4))
+        page.evaluate("window.scrollTo(0, 0)")
+    except Exception:
+        pass
 
 
 def _looks_like_bot_challenge(html: str) -> bool:
     lower = html.lower()
-    return "just a moment..." in lower or "security verification" in lower
+    markers = [
+        "just a moment",
+        "security verification",
+        "checking your browser",
+        "enable javascript",
+        "cf-browser-verification",
+        "challenge-platform",
+        "ray id",
+    ]
+    return any(m in lower for m in markers)
