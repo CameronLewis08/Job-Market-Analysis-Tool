@@ -32,7 +32,7 @@
 
 - [ ] **Step 1: Install playwright and playwright-stealth into the project venv**
 
-Run these in your terminal (activate your project venv first, not `.venv-dbt`):
+Run these in your terminal (activate your project venv first,`.venv-dbt`):
 
 ```
 pip install playwright playwright-stealth
