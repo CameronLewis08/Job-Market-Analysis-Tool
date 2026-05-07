@@ -38,14 +38,14 @@ A scheduled ETL pipeline that scrapes data engineering job listings from We Work
 ### Modules
 
 **Scraper (Python)**
-- `scraper/browser.py` — Selenium Chrome driver lifecycle: creates headless driver, fetches page HTML, enforces 2-3 second random delays between requests, sets an honest user-agent string
-- `scraper/parser.py` — BeautifulSoup parsing: takes raw HTML string, returns a list of listing dicts with fields: id, title, company, category, date_posted, url, location_restriction, salary_raw, description_raw
+- `scraper/browser.py` — Playwright persistent context lifecycle: creates a Chromium context backed by a persistent `browser_profile/` directory (stores Cloudflare `cf_clearance` cookie between runs), applies `playwright-stealth` fingerprint suppression, fetches page HTML with human scroll simulation, enforces 1.5-3 second random delays, and retries up to 3 times on bot challenge pages with 6-12 second exponential backoff
+- `scraper/parser.py` — BeautifulSoup parsing: takes raw HTML string, returns a list of listing dicts with fields: id, title, company, category, date_posted, url, location_restriction, salary_raw, description_raw; handles both legacy `article.job` and new `li.new-listing-container` WWR markup; filters listings older than 7 days
 - `scraper/loader.py` — Postgres upsert: takes a listing dict and a connection, inserts with `ON CONFLICT (id) DO NOTHING`; also owns table creation
-- `scraper/main.py` — Orchestration entry point: initializes browser, iterates over Programming and Data Science category pages (max 5 pages each), parses, deduplicates via DB lookup, loads new listings
+- `scraper/main.py` — Orchestration entry point: initializes Playwright context, iterates over Programming and Data Science category pages (max 1 page each — WWR uses a single-page listing format), parses, deduplicates via DB lookup, loads new listings
 
 **dbt Project**
 - Staging layer: `stg_listings` — casts types, renames columns, light cleaning of `raw_listings`
-- Intermediate layer: `int_listing_skills` — cross-joins `stg_listings` with the `skills` seed using case-insensitive ILIKE matching, producing one row per listing x skill
+- Intermediate layer: `int_listing_skills` — cross-joins `stg_listings` with the `skills` seed using PostgreSQL word-boundary regex matching (`~* ('\m' || skill || '\m')`), producing one row per listing x skill; regex prevents partial-word false positives (e.g. "Python" matching "Jython")
 - Mart layer (5 models):
   - `mart_skill_frequency` — skill -> count of listings mentioning it, filterable by date
   - `mart_skill_salary` — skill -> min/avg/max salary extracted from salary_raw (sparse, includes coverage %)
@@ -54,20 +54,20 @@ A scheduled ETL pipeline that scrapes data engineering job listings from We Work
   - `mart_skill_cooccurrence` — skill_a x skill_b -> count of listings where both appear
 
 **Seeds**
-- `seeds/skills.csv` — ~55 skills with a `skill` column and a `category` column (language, processing, orchestration, warehouse, cloud, infrastructure, transformation, storage, visualization, library)
+- `seeds/skills.csv` — ~85 skills with a `skill` column and a `category` column (language, processing, orchestration, warehouse, cloud, infrastructure, transformation, storage, visualization, library); expanded from the initial ~55 to include web, backend, ML/AI, and DevOps skills
 
 **Dashboard (Streamlit)**
 - `dashboard/app.py` — Single-file Streamlit app with 5 tabs: Skill Rankings (bar chart), Salary by Skill (bar chart with coverage caveat), Hiring by Category (bar chart), Week-over-Week Trends (line chart with multi-skill selector), Skill Co-occurrence (heatmap). Sidebar with global date range filter. Reads directly from Neon mart tables via psycopg2.
 
 **CI/CD**
-- `.github/workflows/pipeline.yml` — Weekly cron schedule (Monday 6am UTC), manual dispatch trigger, ubuntu-latest runner, ChromeDriver setup, runs scraper then dbt (seed -> run -> test)
+- `.github/workflows/pipeline.yml` — Weekly cron schedule (Monday 6am UTC), manual dispatch trigger, ubuntu-latest runner, Playwright Chromium browser setup, runs scraper then dbt (seed -> run -> test)
 
 ### Architectural Decisions
 
 - **ELT pattern**: Raw data loaded as-is; all parsing and transformation owned by dbt. salary_raw and description_raw are plain text in the raw layer.
 - **Listing ID deduplication**: Extracted from the We Work Remotely URL slug. Used as primary key with `ON CONFLICT DO NOTHING` for idempotent loads.
-- **Rate limiting**: 2-3 second random sleep between page requests, max 5 pages per category per run (~100-150 listings per run).
-- **Skill extraction via seed cross-join**: Skills matched using SQL ILIKE against description_raw. No NLP — deterministic, version-controlled, easy to extend.
+- **Rate limiting**: 1.5-3 second random sleep between page requests, max 1 page per category per run (WWR uses a single-page listing format with all current listings on one page).
+- **Skill extraction via seed cross-join**: Skills matched using PostgreSQL word-boundary regex (`~*`) against description_raw. No NLP — deterministic, version-controlled, easy to extend.
 - **Neon dev/prod branches**: Dev branch for local development and dbt experimentation; prod branch for GitHub Actions pipeline output.
 - **Dashboard deployment**: Streamlit Community Cloud — free, public URL, auto-deploys from GitHub, secrets managed in their dashboard UI.
 
@@ -96,7 +96,7 @@ raw_listings:
 - dbt models — tested with dbt's built-in schema tests: `not_null` and `unique` on `stg_listings.id`, `not_null` on `int_listing_skills.skill`, row count warnings on mart models if zero rows are returned.
 
 **Not tested:**
-- `browser.py` — validated implicitly by the full pipeline run
+- `browser.py` — Playwright context behavior validated implicitly by the full pipeline run; config constants (e.g. `BOT_CHALLENGE_RETRIES`) are asserted in `tests/test_scraper_config.py`
 - `loader.py` — validated by idempotent pipeline runs producing no duplicates
 - Streamlit dashboard — validated manually via the live deployment
 
@@ -113,7 +113,7 @@ raw_listings:
 
 ## Further Notes
 
-- We Work Remotely categories to scrape: "Programming" and "Data Science" only. Max 5 pages per category per run.
+- We Work Remotely categories to scrape: "Programming" and "Data Science" only. Max 1 page per category per run (single-page listing format — all current listings appear on one page).
 - The week-over-week trend chart is the hero visualization for interviews — build and polish it first after the pipeline is stable.
 - Salary data will be sparse (many WWR listings omit salary). The dashboard salary view must display a data coverage percentage so the chart is not misleading.
 - Skills seed includes a `category` column so the Skill Rankings chart can be grouped/colored by category (language, orchestration, warehouse, etc.).
