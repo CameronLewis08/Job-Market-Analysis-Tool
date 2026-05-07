@@ -35,6 +35,8 @@ jobs:
           NEON_PASSWORD: ${{ secrets.NEON_PASSWORD }}
           SCRAPER_HEADLESS: "true"
           BOT_CHALLENGE_RETRIES: "6"
+          SCRAPER_MIN_DELAY: "3.0"
+          SCRAPER_MAX_DELAY: "6.0"
         run: python -m scraper.main
 
       - name: Run dbt

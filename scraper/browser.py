@@ -66,7 +66,9 @@ def fetch_page(context: BrowserContext, url: str) -> str:
 
 
 def _polite_delay() -> None:
-    time.sleep(random.uniform(1.5, 3.0))
+    min_delay = float(os.getenv("SCRAPER_MIN_DELAY", "1.5"))
+    max_delay = float(os.getenv("SCRAPER_MAX_DELAY", "3.0"))
+    time.sleep(random.uniform(min_delay, max_delay))
 
 
 def _human_scroll(page) -> None:
