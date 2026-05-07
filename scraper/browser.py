@@ -11,7 +11,7 @@ from scraper.log import get_logger
 
 logger = get_logger(__name__)
 
-BOT_CHALLENGE_RETRIES = 3
+BOT_CHALLENGE_RETRIES = int(os.getenv("BOT_CHALLENGE_RETRIES", "3"))
 _PROFILE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "browser_profile")
 os.makedirs(_PROFILE_DIR, exist_ok=True)
 

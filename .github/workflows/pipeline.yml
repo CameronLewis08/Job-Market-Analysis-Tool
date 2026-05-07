@@ -34,6 +34,7 @@ jobs:
           NEON_USER: ${{ secrets.NEON_USER }}
           NEON_PASSWORD: ${{ secrets.NEON_PASSWORD }}
           SCRAPER_HEADLESS: "true"
+          BOT_CHALLENGE_RETRIES: "6"
         run: python -m scraper.main
 
       - name: Run dbt
