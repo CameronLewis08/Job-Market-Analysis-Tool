@@ -33,6 +33,7 @@ jobs:
           NEON_DB: ${{ secrets.NEON_DB }}
           NEON_USER: ${{ secrets.NEON_USER }}
           NEON_PASSWORD: ${{ secrets.NEON_PASSWORD }}
+          SCRAPER_HEADLESS: "true"
         run: python -m scraper.main
 
       - name: Run dbt
