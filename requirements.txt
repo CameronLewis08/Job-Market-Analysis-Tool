@@ -30,7 +30,6 @@ msgpack==1.1.2
 networkx==3.6.1
 numpy==2.4.4
 orderly-set==5.5.0
-packaging==26.2
 pandas==3.0.2
 parsedatetime==2.6
 pathspec==0.12.1
