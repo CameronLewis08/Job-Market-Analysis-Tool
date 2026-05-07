@@ -1,6 +1,6 @@
 # Job Market Analysis Tool
 
-A weekly ETL pipeline that scrapes data engineering job listings from We Work Remotely, transforms them with dbt, and surfaces the results in a Streamlit dashboard. Answers questions like: which tools are employers actually asking for, how has demand shifted week over week, and which skills cluster together in job descriptions.
+A weekly ETL pipeline that scrapes Programming job listings from We Work Remotely, transforms them with dbt, and surfaces the results in a Streamlit dashboard. Answers questions like: which tools are employers actually asking for, how has demand shifted week over week, and which skills cluster together in job descriptions.
 
 ## What it does
 
