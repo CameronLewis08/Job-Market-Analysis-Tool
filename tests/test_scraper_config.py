@@ -17,9 +17,13 @@ def _literal_from_assignment(file_path: Path, variable_name: str):
     raise AssertionError(f"{variable_name} not found in {file_path}")
 
 
-def test_bot_challenge_retries_is_three():
-    retries = _literal_from_assignment(ROOT / "scraper" / "browser.py", "BOT_CHALLENGE_RETRIES")
-    assert retries == 3
+def test_bot_challenge_retries_default_is_three():
+    import os
+    os.environ.pop("BOT_CHALLENGE_RETRIES", None)
+    import importlib
+    import scraper.browser as browser_mod
+    importlib.reload(browser_mod)
+    assert browser_mod.BOT_CHALLENGE_RETRIES == 3
 
 
 def test_scraper_targets_programming_categories():
