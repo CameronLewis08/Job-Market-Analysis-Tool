@@ -37,9 +37,6 @@ jobs:
           NEON_USER: ${{ secrets.NEON_USER }}
           NEON_PASSWORD: ${{ secrets.NEON_PASSWORD }}
           SCRAPER_HEADLESS: "false"
-          BOT_CHALLENGE_RETRIES: "6"
-          SCRAPER_MIN_DELAY: "3.0"
-          SCRAPER_MAX_DELAY: "6.0"
         run: xvfb-run python -m scraper.main
 
       - name: Run dbt
