@@ -20,7 +20,7 @@ load_dotenv()
 st.set_page_config(page_title="Job Market Intelligence", layout="wide")
 
 
-@st.cache_resource
+@st.cache_resource(ttl=300)
 def get_connection():
     return psycopg2.connect(os.environ["DATABASE_URL"])
 

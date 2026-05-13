@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+.venv/
+.venv-dbt/
+venv/
+
+# Secrets — inject at runtime via --env-file or -e flags
+.env
+
+# Git
+.git/
+.gitignore
+
+# Browser profile (Playwright writes a fresh one inside the container)
+browser_profile/
+
+# Tests and docs not needed at runtime
+tests/
+docs/
+
+# dbt build artifacts
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+dbt/.user.yml
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+
+# Misc project files not needed in image
+*.md
+dockerignore.txt
+agents.txt
+buildidea.md
+.github/

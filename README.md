@@ -4,7 +4,7 @@ A weekly ETL pipeline that scrapes data engineering job listings from We Work Re
 
 ## What it does
 
-- **Scrapes** the Programming and Data Science categories on We Work Remotely every Monday at 6am UTC
+- **Scrapes** the Programming category on We Work Remotely every Monday at 6am UTC
 - **Loads** raw listings into PostgreSQL on Neon (idempotent — duplicates are skipped)
 - **Transforms** with dbt into 5 analytical mart tables
 - **Visualizes** in a Streamlit dashboard with 5 tabs: Skill Rankings, Salary by Skill, Hiring by Category, Week-over-Week Trends, and Skill Co-occurrence
@@ -18,6 +18,7 @@ A weekly ETL pipeline that scrapes data engineering job listings from We Work Re
 | Transformation | dbt |
 | Dashboard | Streamlit |
 | CI/CD | GitHub Actions |
+| Container | Docker |
 
 ## Project structure
 
@@ -26,21 +27,23 @@ scraper/        # Playwright browser, HTML parser, Postgres loader, orchestratio
 dbt/            # Staging, intermediate, and mart models + skills seed
 dashboard/      # Streamlit app
 tests/          # pytest tests for scraper modules
+docs/           # PRD, commands reference, and issue history
 .github/
   workflows/
     pipeline.yml  # Weekly cron + manual dispatch
+Dockerfile      # Container image for the scraper and dashboard
 ```
 
 ## Local setup
 
-**Prerequisites:** Python 3.11+, a Neon account
+**Prerequisites:** Python 3.12, a Neon account
 
 1. Clone the repo and create a virtual environment:
    ```
    python -m venv .venv
    .venv\Scripts\activate      # Windows
    source .venv/bin/activate   # Mac/Linux
-   pip install -r requirements.txt
+   pip install -r requirements.txtS
    playwright install chromium
    ```
 
@@ -78,6 +81,34 @@ tests/          # pytest tests for scraper modules
 ```
 pytest tests/ -v
 ```
+
+## Docker
+
+**Prerequisites:** Docker Desktop
+
+**Build the image**
+```
+docker build -t job-market-scraper .
+```
+
+**Run the scraper**
+```
+docker run --env-file .env job-market-scraper
+```
+
+**Run the dashboard**
+```
+docker run --env-file .env -p 8501:8501 job-market-scraper streamlit run dashboard/app.py --server.address=0.0.0.0
+```
+
+Opens at `http://localhost:8501`.
+
+**Run dbt inside the container**
+```
+docker run --env-file .env -w /app/dbt job-market-scraper sh -c "dbt seed && dbt run && dbt test"
+```
+
+See `docs/commands.md` for a full command reference.
 
 ## CI/CD
 
